@@ -97,16 +97,32 @@ func TestDefaultFieldParser(t *testing.T) {
 		assert.Equal(t, true, got)
 	})
 
-	t.Run("Default required tag", func(t *testing.T) {
+	t.Run("Default required tag - all", func(t *testing.T) {
 		t.Parallel()
 
 		got, err := newTagBaseFieldParser(
 			&Parser{
-				RequiredByDefault: true,
+				RequiredByDefault: "all",
 			},
 			&ast.Field{Tag: &ast.BasicLit{
 				Value: `json:"test"`,
 			}},
+		).IsRequired()
+		assert.NoError(t, err)
+		assert.True(t, got)
+	})
+
+	t.Run("Default required tag - all, pointer field is also required", func(t *testing.T) {
+		t.Parallel()
+
+		got, err := newTagBaseFieldParser(
+			&Parser{
+				RequiredByDefault: "all",
+			},
+			&ast.Field{
+				Tag:  &ast.BasicLit{Value: `json:"test"`},
+				Type: &ast.StarExpr{X: &ast.Ident{Name: "string"}},
+			},
 		).IsRequired()
 		assert.NoError(t, err)
 		assert.True(t, got)
@@ -117,7 +133,7 @@ func TestDefaultFieldParser(t *testing.T) {
 
 		got, err := newTagBaseFieldParser(
 			&Parser{
-				RequiredByDefault: true,
+				RequiredByDefault: "all",
 			},
 			&ast.Field{Tag: &ast.BasicLit{
 				Value: `json:"test" binding:"optional"`,
@@ -128,7 +144,7 @@ func TestDefaultFieldParser(t *testing.T) {
 
 		got, err = newTagBaseFieldParser(
 			&Parser{
-				RequiredByDefault: true,
+				RequiredByDefault: "all",
 			},
 			&ast.Field{Tag: &ast.BasicLit{
 				Value: `json:"test" validate:"optional"`,
@@ -139,7 +155,7 @@ func TestDefaultFieldParser(t *testing.T) {
 
 		got, err = newTagBaseFieldParser(
 			&Parser{
-				RequiredByDefault: true,
+				RequiredByDefault: "all",
 			},
 			&ast.Field{Tag: &ast.BasicLit{
 				Value: `json:"test,omitempty"`,
@@ -149,28 +165,12 @@ func TestDefaultFieldParser(t *testing.T) {
 		assert.False(t, got)
 	})
 
-	t.Run("RequiredByDefaultMode all - field is required", func(t *testing.T) {
+	t.Run("Default required tag - nonpointer, non-pointer field is required", func(t *testing.T) {
 		t.Parallel()
 
 		got, err := newTagBaseFieldParser(
 			&Parser{
-				RequiredByDefaultMode: "all",
-			},
-			&ast.Field{
-				Tag:  &ast.BasicLit{Value: `json:"test"`},
-				Type: &ast.StarExpr{X: &ast.Ident{Name: "string"}},
-			},
-		).IsRequired()
-		assert.NoError(t, err)
-		assert.True(t, got)
-	})
-
-	t.Run("RequiredByDefaultMode pointer - non-pointer field is required", func(t *testing.T) {
-		t.Parallel()
-
-		got, err := newTagBaseFieldParser(
-			&Parser{
-				RequiredByDefaultMode: "pointer",
+				RequiredByDefault: "nonpointer",
 			},
 			&ast.Field{
 				Tag:  &ast.BasicLit{Value: `json:"test"`},
@@ -181,12 +181,12 @@ func TestDefaultFieldParser(t *testing.T) {
 		assert.True(t, got)
 	})
 
-	t.Run("RequiredByDefaultMode pointer - pointer field is not required", func(t *testing.T) {
+	t.Run("Default required tag - nonpointer, pointer field is not required", func(t *testing.T) {
 		t.Parallel()
 
 		got, err := newTagBaseFieldParser(
 			&Parser{
-				RequiredByDefaultMode: "pointer",
+				RequiredByDefault: "nonpointer",
 			},
 			&ast.Field{
 				Tag:  &ast.BasicLit{Value: `json:"test"`},
@@ -197,12 +197,12 @@ func TestDefaultFieldParser(t *testing.T) {
 		assert.False(t, got)
 	})
 
-	t.Run("RequiredByDefaultMode pointer - omitempty overrides non-pointer", func(t *testing.T) {
+	t.Run("Default required tag - nonpointer, omitempty overrides non-pointer", func(t *testing.T) {
 		t.Parallel()
 
 		got, err := newTagBaseFieldParser(
 			&Parser{
-				RequiredByDefaultMode: "pointer",
+				RequiredByDefault: "nonpointer",
 			},
 			&ast.Field{
 				Tag:  &ast.BasicLit{Value: `json:"test,omitempty"`},
@@ -213,12 +213,12 @@ func TestDefaultFieldParser(t *testing.T) {
 		assert.False(t, got)
 	})
 
-	t.Run("RequiredByDefaultMode pointer - optional tag overrides non-pointer", func(t *testing.T) {
+	t.Run("Default required tag - nonpointer, optional tag overrides non-pointer", func(t *testing.T) {
 		t.Parallel()
 
 		got, err := newTagBaseFieldParser(
 			&Parser{
-				RequiredByDefaultMode: "pointer",
+				RequiredByDefault: "nonpointer",
 			},
 			&ast.Field{
 				Tag:  &ast.BasicLit{Value: `json:"test" binding:"optional"`},

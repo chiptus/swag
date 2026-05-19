@@ -554,15 +554,15 @@ func (ps *tagBaseFieldParser) IsRequired() (bool, error) {
 		}
 	}
 
-	switch ps.p.RequiredByDefaultMode {
+	switch ps.p.RequiredByDefault {
 	case "all":
 		return true, nil
-	case "pointer":
+	case "nonpointer":
 		_, isPointer := ps.field.Type.(*ast.StarExpr)
 		return !isPointer, nil
 	}
 
-	return ps.p.RequiredByDefault, nil
+	return false, nil
 }
 
 func parseValidTags(validTag string, sf *structField) {
