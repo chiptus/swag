@@ -554,7 +554,7 @@ func (ps *tagBaseFieldParser) IsRequired() (bool, error) {
 		}
 	}
 
-	switch ps.p.RequiredByDefault {
+	switch ps.p.RequiredByDefaultMode {
 	case "all":
 		return true, nil
 	case "nonpointer":
@@ -562,7 +562,7 @@ func (ps *tagBaseFieldParser) IsRequired() (bool, error) {
 		return !isPointer, nil
 	}
 
-	return false, nil
+	return ps.p.RequiredByDefault, nil
 }
 
 func parseValidTags(validTag string, sf *structField) {

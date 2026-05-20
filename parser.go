@@ -137,9 +137,12 @@ type Parser struct {
 	// Strict whether swag should error or warn when it detects cases which are most likely user errors
 	Strict bool
 
-	// RequiredByDefault controls which fields are marked as required by default.
+	// RequiredByDefault set validation required for all fields by default
+	RequiredByDefault bool
+
+	// RequiredByDefaultMode controls which fields are required by default.
 	// "all" marks all fields as required; "nonpointer" marks only non-pointer fields as required.
-	RequiredByDefault string
+	RequiredByDefaultMode string
 
 	// structStack stores full names of the structures that were already parsed or are being parsed now
 	structStack []*TypeSpecDef
